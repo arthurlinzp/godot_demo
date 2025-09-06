@@ -1,0 +1,30 @@
+[gd_scene load_steps=3 format=3 uid="uid://bwph3ecw1vc43"]
+
+[ext_resource type="Script" path="res://heart.gd" id="1_7p8dj"]
+[ext_resource type="Texture2D" uid="uid://bmegg51dbs876" path="res://heart_ui/Heart_full.png" id="1_cixvg"]
+
+[node name="heart" type="HBoxContainer"]
+offset_right = 40.0
+offset_bottom = 40.0
+scale = Vector2(0.2, 0.2)
+script = ExtResource("1_7p8dj")
+
+[node name="TextureRect" type="TextureRect" parent="."]
+layout_mode = 2
+texture = ExtResource("1_cixvg")
+
+[node name="TextureRect2" type="TextureRect" parent="."]
+layout_mode = 2
+texture = ExtResource("1_cixvg")
+
+[node name="TextureRect3" type="TextureRect" parent="."]
+layout_mode = 2
+texture = ExtResource("1_cixvg")
+
+[node name="TextureRect4" type="TextureRect" parent="."]
+layout_mode = 2
+texture = ExtResource("1_cixvg")
+
+[node name="TextureRect5" type="TextureRect" parent="."]
+layout_mode = 2
+texture = ExtResource("1_cixvg")
