@@ -12,6 +12,7 @@ extends CharacterBody2D
 @onready var attack_coll: CollisionShape2D = $Hitbox/attackColl
 @onready var heart: HBoxContainer = $CanvasLayer/heart
 
+# 攻击后血量+1
 func enable_attack_hitbox():
 	attack_coll.disabled = false
 	cureen_health += 1
@@ -20,6 +21,7 @@ func enable_attack_hitbox():
 func disable_attack_hitbox():
 	attack_coll.disabled = true
 	
+#受伤血量-1
 func demage(value):
 	cureen_health -= value
 	$CanvasLayer/heart.update_heart(cureen_health)
