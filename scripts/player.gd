@@ -15,12 +15,18 @@ extends CharacterBody2D
 # 攻击后血量+1
 func enable_attack_hitbox():
 	attack_coll.disabled = false
-	cureen_health += 1
 	$CanvasLayer/heart.update_heart(cureen_health)
 
 func disable_attack_hitbox():
 	attack_coll.disabled = true
 	
+#攻击血量+1
+func doAttack(value):
+	if cureen_health >= 5:
+		return
+	cureen_health += value
+	$CanvasLayer/heart.update_heart(cureen_health)
+
 #受伤血量-1
 func demage(value):
 	cureen_health -= value
