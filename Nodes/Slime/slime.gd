@@ -1,6 +1,8 @@
 # Slime.gd (Final Corrected Version)
 extends CharacterBody2D
 
+signal health_changed(current_hp, max_hp)
+
 # --- 可调整的参数 ---
 @export var speed: float = 120.0
 @export var jump_height: float = -250.0
@@ -22,6 +24,7 @@ var player: Node2D = null  # 玩家节点引用
 @onready var wall_detector = $WallDetector
 @onready var ledge_detector = $LedgeDetector
 @onready var animation_player: AnimationPlayer = $AnimationPlayer
+@onready var health_bar: ProgressBar = $HealthBar
 
 # --- 受击效果相关 ---
 var is_hurt: bool = false
@@ -39,7 +42,12 @@ func _ready():
 	
 	# 获取玩家节点引用
 	player = get_tree().get_nodes_in_group("player")[0] if get_tree().get_nodes_in_group("player").size() > 0 else null
-
+	
+	# 连接信号到 HealthBar 的更新函数
+	health_changed.connect(_on_health_changed)
+	# 初始化 HealthBar 的显示
+	health_changed.emit(current_hp, max_hp)
+	
 func _physics_process(delta):
 	# 持续施加重力
 	if not is_on_floor():
@@ -98,6 +106,9 @@ func take_damage(amount: int, from_position: Vector2 = Vector2.ZERO):
 	current_hp -= amount
 	print("Slime HP: ", current_hp, "/", max_hp)
 	
+	health_changed.emit(current_hp, max_hp)
+	health_bar.visible = true
+	
 	# 添加受击效果
 	if current_hp > 0:
 		_apply_hurt_effect(from_position)
@@ -154,3 +165,7 @@ func _follow_player():
 	
 	velocity.x = follow_speed * direction
 	_update_visuals()
+
+func _on_health_changed(new_hp: int, max_hp_value: int):
+	health_bar.max_value = max_hp_value
+	health_bar.value = new_hp

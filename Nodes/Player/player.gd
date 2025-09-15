@@ -1,6 +1,8 @@
 # Player.gd
 extends CharacterBody2D
 
+signal health_changed(current_hp, max_hp)
+
 # 将这些变量导出，以便在状态脚本中通过 @export 引用
 @export var speed: float = 300.0
 @export var jump_velocity: float = -400.0
@@ -21,17 +23,24 @@ var hurt_duration: float = 0.25
 var hurt_timer: float = 0.0
 var knockback_power: float = 200.0
 
+# 新增一个死亡状态锁，防止多次触发死亡逻辑
+var is_dead: bool = false
+
 
 func _ready():
+	# 将Player添加到player组中，方便Slime查找
+	add_to_group("player")
 	current_hp = max_hp
 	# 确保Hitbox一开始是禁用的
 	player_hitbox.get_node("CollisionShape2D").disabled = true
 	# 连接动画播放完成信号
 	animation_player.animation_finished.connect(_on_animation_finished)
-	# 将Player添加到player组中，方便Slime查找
-	add_to_group("player")
-
+	health_changed.emit(current_hp, max_hp)
+	
 func _physics_process(delta):
+	# 如果已经死了，就停止所有物理和受击处理
+	if is_dead:
+		return
 	# 重力应用
 	if not is_on_floor():
 		velocity.y += gravity * delta
@@ -52,16 +61,21 @@ func _physics_process(delta):
 	
 # --- 核心函数 ---
 func take_damage(amount: int, from_position: Vector2 = Vector2.ZERO):
+	# 如果已经死了，立即返回，不处理任何后续伤害
+	if is_dead:
+		return
 	current_hp -= amount
+	if current_hp < 0:
+		current_hp = 0
 	print("Player HP: ", current_hp, "/", max_hp)
+	health_changed.emit(current_hp, max_hp)
 	
-	# 添加受击效果
-	if current_hp > 0:
-		_apply_hurt_effect(from_position)
-	
-	# 在这里可以添加受伤动画、音效、屏幕闪烁等
+	# 调整逻辑顺序：先判断是否死亡
 	if current_hp <= 0:
 		die()
+	else:
+		# 如果没死，才应用受伤效果
+		_apply_hurt_effect(from_position)
 
 func _apply_hurt_effect(from_position: Vector2):
 	is_hurt = true
@@ -73,8 +87,11 @@ func _apply_hurt_effect(from_position: Vector2):
 	velocity.y = -knockback_power * 0.5  # 向上击飞效果
 
 func die():
+	if is_dead:
+		return
 	print("Player has died!")
 	animation_player.play("die")
+	state_machine.set_physics_process(false)
 
 # --- 连接信号的回调函数 ---
 func _on_player_hitbox_area_entered(area):

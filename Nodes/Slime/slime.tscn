@@ -7,48 +7,6 @@
 [sub_resource type="CircleShape2D" id="CircleShape2D_34hpl"]
 radius = 12.0416
 
-[sub_resource type="Animation" id="Animation_j8fgj"]
-resource_name = "idle"
-length = 0.8
-loop_mode = 1
-step = 0.1
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("Sprite2D:texture")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 1,
-"values": [ExtResource("1_en0ls")]
-}
-tracks/1/type = "value"
-tracks/1/imported = false
-tracks/1/enabled = true
-tracks/1/path = NodePath("Sprite2D:hframes")
-tracks/1/interp = 1
-tracks/1/loop_wrap = true
-tracks/1/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 1,
-"values": [8]
-}
-tracks/2/type = "value"
-tracks/2/imported = false
-tracks/2/enabled = true
-tracks/2/path = NodePath("Sprite2D:frame")
-tracks/2/interp = 1
-tracks/2/loop_wrap = true
-tracks/2/keys = {
-"times": PackedFloat32Array(0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1),
-"update": 1,
-"values": [0, 1, 2, 3, 4, 5, 6, 7]
-}
-
 [sub_resource type="Animation" id="Animation_s5gio"]
 length = 0.001
 tracks/0/type = "value"
@@ -129,6 +87,48 @@ tracks/2/keys = {
 "values": [0, 1, 2, 3, 4, 5, 6]
 }
 
+[sub_resource type="Animation" id="Animation_j8fgj"]
+resource_name = "idle"
+length = 0.8
+loop_mode = 1
+step = 0.1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:texture")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [ExtResource("1_en0ls")]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Sprite2D:hframes")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [8]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Sprite2D:frame")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [0, 1, 2, 3, 4, 5, 6, 7]
+}
+
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_l7wdp"]
 _data = {
 &"RESET": SubResource("Animation_s5gio"),
@@ -186,5 +186,13 @@ collision_mask = 8
 [node name="CollisionShape2D" type="CollisionShape2D" parent="SlimeHurtbox"]
 position = Vector2(1, 10)
 shape = SubResource("CircleShape2D_j8fgj")
+
+[node name="HealthBar" type="ProgressBar" parent="."]
+offset_left = -19.0
+offset_top = -18.0
+offset_right = 63.0
+offset_bottom = 9.0
+scale = Vector2(0.5, 0.5)
+show_percentage = false
 
 [connection signal="area_entered" from="SlimeHitbox" to="." method="_on_slime_hitbox_area_entered"]

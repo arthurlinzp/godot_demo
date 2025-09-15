@@ -1,8 +1,9 @@
-[gd_scene load_steps=6 format=3 uid="uid://dd3ah5b2ut7ql"]
+[gd_scene load_steps=7 format=3 uid="uid://dd3ah5b2ut7ql"]
 
 [ext_resource type="Texture2D" uid="uid://cwtk5m687txdd" path="res://Assets/Tree-Assets.png" id="1_nnsk1"]
 [ext_resource type="PackedScene" uid="uid://lxabxopmcl63" path="res://Nodes/Slime/slime.tscn" id="3_4wyf3"]
 [ext_resource type="PackedScene" uid="uid://cnt6cu33vb6yb" path="res://Nodes/Player/player.tscn" id="3_k0juu"]
+[ext_resource type="PackedScene" uid="uid://bpaup72x7mr8q" path="res://Nodes/GameUI/gameui.tscn" id="4_k0juu"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_rwgxs"]
 texture = ExtResource("1_nnsk1")
@@ -33,3 +34,5 @@ position = Vector2(64, 79)
 
 [node name="Slime" parent="." instance=ExtResource("3_4wyf3")]
 position = Vector2(695, 39)
+
+[node name="GameUI" parent="." instance=ExtResource("4_k0juu")]
