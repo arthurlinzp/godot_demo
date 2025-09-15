@@ -13,6 +13,13 @@ extends CharacterBody2D
 var gravity = ProjectSettings.get_setting("physics/2d/default_gravity")
 @onready var state_machine = $StateMachine
 @onready var animation_player: AnimationPlayer = $AnimationPlayer
+@onready var sprite: Sprite2D = $Sprite2D
+
+# --- 受击效果相关 ---
+var is_hurt: bool = false
+var hurt_duration: float = 0.25
+var hurt_timer: float = 0.0
+var knockback_power: float = 200.0
 
 
 func _ready():
@@ -21,23 +28,49 @@ func _ready():
 	player_hitbox.get_node("CollisionShape2D").disabled = true
 	# 连接动画播放完成信号
 	animation_player.animation_finished.connect(_on_animation_finished)
+	# 将Player添加到player组中，方便Slime查找
+	add_to_group("player")
 
 func _physics_process(delta):
 	# 重力应用
 	if not is_on_floor():
 		velocity.y += gravity * delta
 
+	# 处理受击效果
+	if is_hurt:
+		hurt_timer -= delta
+		# 闪烁效果
+		sprite.modulate = Color(1, 1, 1) if fmod(hurt_timer, 0.1) < 0.05 else Color(1, 0, 0)
+		
+		if hurt_timer <= 0:
+			is_hurt = false
+			sprite.modulate = Color(1, 1, 1)
+
 	# 统一执行移动
 	move_and_slide()
 	
 	
 # --- 核心函数 ---
-func take_damage(amount: int):
+func take_damage(amount: int, from_position: Vector2 = Vector2.ZERO):
 	current_hp -= amount
 	print("Player HP: ", current_hp, "/", max_hp)
+	
+	# 添加受击效果
+	if current_hp > 0:
+		_apply_hurt_effect(from_position)
+	
 	# 在这里可以添加受伤动画、音效、屏幕闪烁等
 	if current_hp <= 0:
 		die()
+
+func _apply_hurt_effect(from_position: Vector2):
+	is_hurt = true
+	hurt_timer = hurt_duration
+	
+	# 计算击退方向（远离攻击源）
+	var knockback_direction = (global_position - from_position).normalized()
+	velocity.x = knockback_direction.x * knockback_power
+	velocity.y = -knockback_power * 0.5  # 向上击飞效果
 
 func die():
 	print("Player has died!")
@@ -52,7 +85,7 @@ func _on_player_hitbox_area_entered(area):
 	# 让被击中的对象受伤
 	# area.get_parent() 会获取到 Slime 根节点
 	if area.get_parent().has_method("take_damage"):
-		area.get_parent().take_damage(damage)
+		area.get_parent().take_damage(damage, global_position)
 
 # 添加动画完成回调函数
 func _on_animation_finished(anim_name):

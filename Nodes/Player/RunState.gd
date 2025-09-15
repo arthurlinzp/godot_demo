@@ -45,8 +45,8 @@ func physics_update(_delta: float):
 		
 	var hitbox = player.get_node("PlayerHitbox")
 	hitbox.scale.x = sprite.scale.x
-	var hurtbox = player.get_node("PlayerHurtbox")
-	hurtbox.scale.x = sprite.scale.x
+	#var hurtbox = player.get_node("PlayerHurtbox")
+	#hurtbox.scale.x = sprite.scale.x
 	
 	# 如果没有移动输入，切换回站立
 	if direction == 0:
