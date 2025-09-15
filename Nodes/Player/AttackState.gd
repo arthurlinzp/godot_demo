@@ -8,8 +8,8 @@ func enter():
 	animation_player.play("attack")
 	print("Entering Attack State")
 	
-	# 攻击时通常不能移动
-	player.velocity.x = 0
+	# # 攻击时通常不能移动
+	# player.velocity.x = 0
 	
 	# 连接信号：当动画播放完成时，调用 _on_animation_finished 函数
 	animation_player.animation_finished.connect(_on_animation_finished)

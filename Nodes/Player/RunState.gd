@@ -3,7 +3,6 @@ extends State
 
 @export var player: CharacterBody2D
 @export var animation_player: AnimationPlayer
-@export var speed: float = 300.0
 
 func enter():
 	print("Entering Run State")
@@ -37,7 +36,6 @@ func physics_update(_delta: float):
 	player.velocity.x = direction * player.speed
 	
 	# --- 修改后的翻转逻辑 ---
-	# 假设你的精灵节点名为 "Sprite2D"，如果不是请修改
 	var sprite = player.get_node("Sprite2D")
 	
 	if direction > 0:

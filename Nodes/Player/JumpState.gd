@@ -21,3 +21,8 @@ func physics_update(_delta: float):
 	# 可以在这里添加空中左右移动的逻辑
 	var direction = Input.get_axis("left", "right")
 	player.velocity.x = direction * 200.0 # 空中速度可以慢一点
+
+	# 允许起跳时攻击
+	if Input.is_action_just_pressed("attack"):
+		get_parent().change_state("Attack")
+		return

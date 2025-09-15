@@ -9,6 +9,12 @@ func enter():
 	print("Entering Fall State")
 
 func physics_update(_delta: float):
+
+	# 允许下落时攻击
+	if Input.is_action_just_pressed("attack"):
+		get_parent().change_state("Attack")
+		return
+
 	# 检查是否已落地
 	if player.is_on_floor():
 		# 根据落地时是否有移动输入来决定下一个状态
