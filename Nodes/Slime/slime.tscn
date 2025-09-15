@@ -1,0 +1,190 @@
+[gd_scene load_steps=10 format=3 uid="uid://lxabxopmcl63"]
+
+[ext_resource type="Script" uid="uid://yxnj46ykcrae" path="res://Nodes/Slime/slime.gd" id="1_34hpl"]
+[ext_resource type="Texture2D" uid="uid://dmqryciqhmsrw" path="res://Assets/AssetBundle/Sprites/Slimer.png" id="1_en0ls"]
+[ext_resource type="Texture2D" uid="uid://0icmfcjax3wb" path="res://Assets/AssetBundle/Sprites/SlimerDeath.png" id="3_j8fgj"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_34hpl"]
+radius = 12.0416
+
+[sub_resource type="Animation" id="Animation_j8fgj"]
+resource_name = "idle"
+length = 0.8
+loop_mode = 1
+step = 0.1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:texture")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [ExtResource("1_en0ls")]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Sprite2D:hframes")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [8]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Sprite2D:frame")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [0, 1, 2, 3, 4, 5, 6, 7]
+}
+
+[sub_resource type="Animation" id="Animation_s5gio"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:texture")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [ExtResource("1_en0ls")]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Sprite2D:hframes")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [8]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Sprite2D:frame")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [0]
+}
+
+[sub_resource type="Animation" id="Animation_l7wdp"]
+resource_name = "die"
+length = 0.7
+step = 0.1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:texture")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [ExtResource("3_j8fgj")]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Sprite2D:hframes")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [7]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Sprite2D:frame")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [0, 1, 2, 3, 4, 5, 6]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_l7wdp"]
+_data = {
+&"RESET": SubResource("Animation_s5gio"),
+&"die": SubResource("Animation_l7wdp"),
+&"idle": SubResource("Animation_j8fgj")
+}
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_j8fgj"]
+radius = 14.0357
+
+[node name="Slime" type="CharacterBody2D"]
+position = Vector2(51, -24)
+collision_layer = 4
+collision_mask = 3
+script = ExtResource("1_34hpl")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("1_en0ls")
+hframes = 8
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(1, 10)
+shape = SubResource("CircleShape2D_34hpl")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+&"": SubResource("AnimationLibrary_l7wdp")
+}
+autoplay = "idle"
+
+[node name="JumpTimer" type="Timer" parent="."]
+wait_time = 2.0
+one_shot = true
+autostart = true
+
+[node name="WallDetector" type="RayCast2D" parent="."]
+target_position = Vector2(-30, 0)
+
+[node name="LedgeDetector" type="RayCast2D" parent="."]
+position = Vector2(-58, 0)
+target_position = Vector2(0, 30)
+
+[node name="SlimeHitbox" type="Area2D" parent="."]
+collision_layer = 32
+collision_mask = 64
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="SlimeHitbox"]
+position = Vector2(1, 10)
+shape = SubResource("CircleShape2D_j8fgj")
+
+[node name="SlimeHurtbox" type="Area2D" parent="."]
+collision_layer = 16
+collision_mask = 8
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="SlimeHurtbox"]
+position = Vector2(1, 10)
+shape = SubResource("CircleShape2D_j8fgj")
+
+[connection signal="area_entered" from="SlimeHitbox" to="." method="_on_slime_hitbox_area_entered"]

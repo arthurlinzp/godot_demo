@@ -1,4 +1,4 @@
-[gd_scene load_steps=21 format=3 uid="uid://cnt6cu33vb6yb"]
+[gd_scene load_steps=24 format=3 uid="uid://cnt6cu33vb6yb"]
 
 [ext_resource type="Texture2D" uid="uid://dr2pljq7v6fmd" path="res://Assets/120x80_PNGSheets/_Idle.png" id="1_65o2i"]
 [ext_resource type="Script" uid="uid://bska2si6akjpu" path="res://Nodes/Player/player.gd" id="1_e0yf7"]
@@ -6,6 +6,7 @@
 [ext_resource type="Texture2D" uid="uid://c1il7qsxdrmpp" path="res://Assets/120x80_PNGSheets/_Run.png" id="3_lkjqq"]
 [ext_resource type="Texture2D" uid="uid://b1yyoqgomjeig" path="res://Assets/120x80_PNGSheets/_Jump.png" id="4_sldgk"]
 [ext_resource type="Texture2D" uid="uid://cdfs7q74attue" path="res://Assets/120x80_PNGSheets/_Fall.png" id="5_e0yf7"]
+[ext_resource type="Texture2D" uid="uid://c543son8uw8lg" path="res://Assets/120x80_PNGSheets/_Death.png" id="7_dqufp"]
 [ext_resource type="Script" uid="uid://chfegykg17dop" path="res://Nodes/Player/IdleState.gd" id="7_rn3hg"]
 [ext_resource type="Script" uid="uid://d4kv1bu7epvuk" path="res://Nodes/Player/StateMachine.gd" id="7_tdvti"]
 [ext_resource type="Script" uid="uid://cvxorqrqnh8hr" path="res://Nodes/Player/RunState.gd" id="8_dqufp"]
@@ -51,6 +52,18 @@ tracks/2/keys = {
 "update": 1,
 "values": [0]
 }
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("PlayerHitbox/CollisionShape2D:disabled")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
 
 [sub_resource type="Animation" id="Animation_q1ymb"]
 resource_name = "attack"
@@ -91,6 +104,18 @@ tracks/2/keys = {
 "transitions": PackedFloat32Array(1, 1, 1, 1),
 "update": 1,
 "values": [0, 1, 2, 3]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("PlayerHitbox/CollisionShape2D:disabled")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.3),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 1,
+"values": [true, false, true]
 }
 
 [sub_resource type="Animation" id="Animation_ripo5"]
@@ -259,10 +284,51 @@ tracks/2/keys = {
 "values": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 }
 
+[sub_resource type="Animation" id="Animation_bnxn6"]
+resource_name = "die"
+step = 0.1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:texture")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [ExtResource("7_dqufp")]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Sprite2D:hframes")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [10]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Sprite2D:frame")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+}
+
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_q1ymb"]
 _data = {
 &"RESET": SubResource("Animation_lkjqq"),
 &"attack": SubResource("Animation_q1ymb"),
+&"die": SubResource("Animation_bnxn6"),
 &"fall": SubResource("Animation_ripo5"),
 &"idle": SubResource("Animation_us8wf"),
 &"jump": SubResource("Animation_tdvti"),
@@ -272,8 +338,13 @@ _data = {
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_65o2i"]
 size = Vector2(13.5, 38)
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_rn3hg"]
+size = Vector2(52, 41)
+
 [node name="Player" type="CharacterBody2D"]
 position = Vector2(4, -40)
+collision_layer = 2
+collision_mask = 5
 script = ExtResource("1_e0yf7")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
@@ -310,3 +381,22 @@ script = ExtResource("10_7km3q")
 script = ExtResource("11_vooq2")
 
 [node name="Camera2D" type="Camera2D" parent="."]
+
+[node name="PlayerHitbox" type="Area2D" parent="."]
+collision_layer = 8
+collision_mask = 16
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PlayerHitbox"]
+position = Vector2(30, 18.5)
+shape = SubResource("RectangleShape2D_rn3hg")
+disabled = true
+
+[node name="PlayerHurtbox" type="Area2D" parent="."]
+collision_layer = 64
+collision_mask = 32
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PlayerHurtbox"]
+position = Vector2(-4.75, 21)
+shape = SubResource("RectangleShape2D_65o2i")
+
+[connection signal="area_entered" from="PlayerHitbox" to="." method="_on_player_hitbox_area_entered"]

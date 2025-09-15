@@ -42,7 +42,12 @@ func physics_update(_delta: float):
 		sprite.scale.x = 1 # 面向右
 	elif direction < 0:
 		sprite.scale.x = -1 # 面向左
-
+		
+	var hitbox = player.get_node("PlayerHitbox")
+	hitbox.scale.x = sprite.scale.x
+	var hurtbox = player.get_node("PlayerHurtbox")
+	hurtbox.scale.x = sprite.scale.x
+	
 	# 如果没有移动输入，切换回站立
 	if direction == 0:
 		get_parent().change_state("Idle")

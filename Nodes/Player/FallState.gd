@@ -38,3 +38,9 @@ func physics_update(_delta: float):
 		sprite.scale.x = 1 # 面向右
 	elif direction < 0:
 		sprite.scale.x = -1 # 面向左
+	
+	var hitbox = player.get_node("PlayerHitbox")
+	hitbox.scale.x = sprite.scale.x
+	var hurtbox = player.get_node("PlayerHurtbox")
+	hurtbox.scale.x = sprite.scale.x
+	

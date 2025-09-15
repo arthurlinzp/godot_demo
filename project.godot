@@ -15,14 +15,15 @@ run/main_scene="uid://dd3ah5b2ut7ql"
 config/features=PackedStringArray("4.4", "Forward Plus")
 config/icon="res://icon.svg"
 
+[autoload]
+
+Global="*res://scripts/Global.gd"
+
 [display]
 
 window/size/viewport_width=384
 window/size/viewport_height=216
-window/size/window_width_override=384
-window/size/window_height_override=216
-window/stretch/mode="canvas_items"
-window/stretch/scale_mode="integer"
+window/size/mode=1
 
 [input]
 
@@ -54,8 +55,13 @@ attack2={
 
 [layer_names]
 
-2d_physics/layer_5="player受击"
-2d_physics/layer_6="slime受击"
+2d_physics/layer_1="world地面、墙壁等环境s"
+2d_physics/layer_2="player_body玩家的物理身体"
+2d_physics/layer_3="enemy_body敌人的物理身体"
+2d_physics/layer_4="player_hitbox玩家的攻击判定区"
+2d_physics/layer_5="enemy_hurtbox敌人的受伤判定区"
+2d_physics/layer_6="enemy_hitbox敌人的攻击判定区"
+2d_physics/layer_7="player_hurtbox玩家的受伤判定区"
 
 [rendering]
 

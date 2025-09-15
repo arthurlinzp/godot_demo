@@ -4,12 +4,16 @@ extends State
 var player: CharacterBody2D
 var animation_player: AnimationPlayer
 
+# --- 新增：可调整的摩擦力 ---
+# 这个值越大，惯性滑行停止得越快。你可以在编辑器里微调它。
+@export var friction: float = 200.0
+
 func enter():
 	animation_player.play("attack")
 	print("Entering Attack State")
 	
-	# # 攻击时通常不能移动
-	# player.velocity.x = 0
+	# 攻击时通常不能移动
+	player.velocity.x *= 0.5
 	
 	# 连接信号：当动画播放完成时，调用 _on_animation_finished 函数
 	animation_player.animation_finished.connect(_on_animation_finished)
@@ -29,6 +33,7 @@ func _on_animation_finished(anim_name: StringName):
 			# 如果在空中攻击，结束后应该进入下落状态
 			get_parent().change_state("Fall")
 
-# 在攻击状态下，我们通常不处理输入，所以 physics_update 可以为空
+# 在攻击状态下
 func physics_update(_delta: float):
+	player.velocity.x = move_toward(player.velocity.x, 0, friction * _delta)
 	pass
