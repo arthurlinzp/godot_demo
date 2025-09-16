@@ -9,6 +9,7 @@ signal health_changed(current_hp, max_hp)
 @export var detect_range: float = 100.0  # 检测玩家的范围
 @export var follow_speed: float = 150.0  # 追踪玩家时的速度
 var gravity = ProjectSettings.get_setting("physics/2d/default_gravity")
+@export var friction: float = 1000.0 # 值越大，停得越快
 
 # --- 生命值相关 ---
 @export var max_hp: int = 50
@@ -30,7 +31,9 @@ var player: Node2D = null  # 玩家节点引用
 var is_hurt: bool = false
 var hurt_duration: float = 0.25
 var hurt_timer: float = 0.0
-var knockback_power: float = 150.0
+var knockback_power: float = 250.0
+
+var is_dead: bool = false
 
 
 func _ready():
@@ -49,21 +52,26 @@ func _ready():
 	health_changed.emit(current_hp, max_hp)
 	
 func _physics_process(delta):
+	if is_dead:
+		return
+		
 	# 持续施加重力
 	if not is_on_floor():
 		velocity.y += gravity * delta
-		if not is_hurt:
+		# 在空中时，让击退效果持续，但可以稍微减速
+		if is_hurt:
+			velocity.x = move_toward(velocity.x, 0, friction * 0.1 * delta)
+		else: # 如果没受伤，则按正常逻辑移动
 			velocity.x = speed * direction * 0.8
-	else:
-		# 当在地面上时，让它有一个比较慢的速度，以防止它停在悬崖边
-		# 这样比较能触发LedgeDetector
-		if not is_hurt:
-			velocity.x = speed * direction * 0.2
-
+			
 	# 处理受击效果
 	if is_hurt:
+		# 如果在地面上，施加摩擦力让它停下来
+		if is_on_floor():
+			velocity.x = move_toward(velocity.x, 0, friction * delta)
+		
+		# 倒计时和闪烁效果保持不变
 		hurt_timer -= delta
-		# 闪烁效果
 		sprite.modulate = Color(1, 1, 1) if fmod(hurt_timer, 0.1) < 0.05 else Color(1, 0, 0)
 		
 		if hurt_timer <= 0:
@@ -126,9 +134,20 @@ func _apply_hurt_effect(from_position: Vector2):
 	velocity.y = -knockback_power * 0.5  # 向上击飞效果
 
 func die():
+	if is_dead:
+		return
+	is_dead = true # 锁住死亡状态！
+	
 	print("Slime has died!")
 	animation_player.play("die")
-	# 不再直接调用queue_free()，而是在动画播放完成后再释放
+	
+	# 停止所有潜在的移动和交互
+	jump_timer.stop() # 停止AI计时器，防止死后还想跳
+	velocity = Vector2.ZERO # 立即停止当前所有速度
+	# 使用 set_deferred 来安全地禁用碰撞体
+	get_node("CollisionShape2D").set_deferred("disabled", true)
+	get_node("SlimeHitbox/CollisionShape2D").set_deferred("disabled", true)
+	get_node("SlimeHurtbox/CollisionShape2D").set_deferred("disabled", true)
 
 # 添加动画完成回调函数
 func _on_animation_finished(anim_name):

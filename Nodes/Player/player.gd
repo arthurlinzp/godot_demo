@@ -35,7 +35,7 @@ func _ready():
 	player_hitbox.get_node("CollisionShape2D").disabled = true
 	# 连接动画播放完成信号
 	animation_player.animation_finished.connect(_on_animation_finished)
-	health_changed.emit(current_hp, max_hp)
+	call_deferred("_emit_initial_health")
 	
 func _physics_process(delta):
 	# 如果已经死了，就停止所有物理和受击处理
@@ -108,3 +108,6 @@ func _on_player_hitbox_area_entered(area):
 func _on_animation_finished(anim_name):
 	if anim_name == "die":
 		queue_free()
+
+func _emit_initial_health():
+	health_changed.emit(current_hp, max_hp)
