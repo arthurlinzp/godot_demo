@@ -16,7 +16,9 @@ func enter():
 	player.velocity.x *= 0.5
 	
 	# 连接信号：当动画播放完成时，调用 _on_animation_finished 函数
-	animation_player.animation_finished.connect(_on_animation_finished)
+	# 先检查是否已经连接，避免重复连接导致多次触发
+	if not animation_player.is_connected("animation_finished", _on_animation_finished):
+		animation_player.animation_finished.connect(_on_animation_finished)
 
 func exit():
 	# 离开状态时，务必断开信号连接，防止多次连接
@@ -35,5 +37,6 @@ func _on_animation_finished(anim_name: StringName):
 
 # 在攻击状态下
 func physics_update(_delta: float):
+	# 逐渐减少水平速度，实现摩擦效果
+	# move_toward 是 Godot 提供的实用函数，用于平滑地移动值接近目标值
 	player.velocity.x = move_toward(player.velocity.x, 0, friction * _delta)
-	pass

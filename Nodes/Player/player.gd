@@ -108,6 +108,7 @@ func _on_player_hitbox_area_entered(area):
 func _on_animation_finished(anim_name):
 	if anim_name == "die":
 		queue_free()
+		get_tree().reload_current_scene()
 
 func _emit_initial_health():
 	health_changed.emit(current_hp, max_hp)

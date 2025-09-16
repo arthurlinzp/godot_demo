@@ -28,6 +28,7 @@ var player: Node2D = null  # 玩家节点引用
 @onready var health_bar: ProgressBar = $HealthBar
 
 # --- 受击效果相关 ---
+const KNOCKBACK_VERTICAL_POWER: float = 0.5
 var is_hurt: bool = false
 var hurt_duration: float = 0.25
 var hurt_timer: float = 0.0
@@ -55,8 +56,10 @@ func _physics_process(delta):
 	if is_dead:
 		return
 		
+	var on_floor = is_on_floor()
+		
 	# 持续施加重力
-	if not is_on_floor():
+	if not on_floor:
 		velocity.y += gravity * delta
 		# 在空中时，让击退效果持续，但可以稍微减速
 		if is_hurt:
@@ -67,8 +70,10 @@ func _physics_process(delta):
 	# 处理受击效果
 	if is_hurt:
 		# 如果在地面上，施加摩擦力让它停下来
-		if is_on_floor():
+		if on_floor:
 			velocity.x = move_toward(velocity.x, 0, friction * delta)
+			if abs(velocity.x) < 0.1:
+				velocity.x = 0
 		
 		# 倒计时和闪烁效果保持不变
 		hurt_timer -= delta
@@ -81,7 +86,7 @@ func _physics_process(delta):
 	# -----------------------------------------------------------------
 	# 在物理帧中持续检测环境，实现立即反应
 	# 只有当史莱姆在地面上时，才需要检查前方是否有障碍
-	if is_on_floor() and not is_hurt:
+	if on_floor and not is_hurt:
 		# 检查是否需要追踪玩家
 		if _should_follow_player():
 			_follow_player()
@@ -131,7 +136,7 @@ func _apply_hurt_effect(from_position: Vector2):
 	# 计算击退方向（远离攻击源）
 	var knockback_direction = (global_position - from_position).normalized()
 	velocity.x = knockback_direction.x * knockback_power
-	velocity.y = -knockback_power * 0.5  # 向上击飞效果
+	velocity.y = -knockback_power * KNOCKBACK_VERTICAL_POWER  # 向上击飞效果
 
 func die():
 	if is_dead:
@@ -145,9 +150,16 @@ func die():
 	jump_timer.stop() # 停止AI计时器，防止死后还想跳
 	velocity = Vector2.ZERO # 立即停止当前所有速度
 	# 使用 set_deferred 来安全地禁用碰撞体
-	get_node("CollisionShape2D").set_deferred("disabled", true)
-	get_node("SlimeHitbox/CollisionShape2D").set_deferred("disabled", true)
-	get_node("SlimeHurtbox/CollisionShape2D").set_deferred("disabled", true)
+	var shapes = [
+		"CollisionShape2D",
+		"SlimeHitbox/CollisionShape2D",
+		"SlimeHurtbox/CollisionShape2D"
+	]
+	
+	for path in shapes:
+		var node = get_node_or_null(path)
+		if node:
+			node.set_deferred("disabled", true)
 
 # 添加动画完成回调函数
 func _on_animation_finished(anim_name):
@@ -176,14 +188,20 @@ func _should_follow_player() -> bool:
 	return horizontal_distance <= detect_range and vertical_distance <= 32
 
 func _follow_player():
-	# 朝玩家方向移动
-	if player.global_position.x > global_position.x:
-		direction = 1  # 向右
-	else:
-		direction = -1  # 向左
-	
+	var player_x = player.global_position.x
+	var slime_x = global_position.x
+	var dx = player_x - slime_x
+	# 获取“玩家相对于史莱姆”的目标方向
+	var target_dir = 1 if dx > 0 else -1
+	# 🚫 只有当目标方向与当前方向不一致时，才考虑是否转向
+	if target_dir != direction:
+		# 💡 智能转向：只有当玩家“越过中线”（dx 绝对值较大）时才允许转向
+		# 避免贴脸时因微小位移抖动
+		if abs(dx) > 8.0:  # 可调参数，推荐 5~15
+			direction = target_dir
+			_update_visuals()
+	# 保持移动
 	velocity.x = follow_speed * direction
-	_update_visuals()
 
 func _on_health_changed(new_hp: int, max_hp_value: int):
 	health_bar.max_value = max_hp_value

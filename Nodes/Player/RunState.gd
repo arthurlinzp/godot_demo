@@ -35,7 +35,15 @@ func physics_update(_delta: float):
 	var direction = Input.get_axis("left", "right")
 	player.velocity.x = direction * player.speed
 	
-	# --- 修改后的翻转逻辑 ---
+	# 更新精灵方向
+	_update_sprite_direction(direction)
+	
+	# 如果没有移动输入，切换回站立
+	if direction == 0:
+		get_parent().change_state("Idle")
+		return
+
+func _update_sprite_direction(direction: float) -> void:
 	var sprite = player.get_node("Sprite2D")
 	
 	if direction > 0:
@@ -45,10 +53,3 @@ func physics_update(_delta: float):
 		
 	var hitbox = player.get_node("PlayerHitbox")
 	hitbox.scale.x = sprite.scale.x
-	#var hurtbox = player.get_node("PlayerHurtbox")
-	#hurtbox.scale.x = sprite.scale.x
-	
-	# 如果没有移动输入，切换回站立
-	if direction == 0:
-		get_parent().change_state("Idle")
-		return
